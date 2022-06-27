@@ -6,14 +6,11 @@ import inc.evil.refactorswitch.domain.ProductStatus;
 import inc.evil.refactorswitch.exceptions.ProductNotFoundException;
 import inc.evil.refactorswitch.exceptions.ProductPaymentException;
 import inc.evil.refactorswitch.repo.ProductRepository;
-import inc.evil.refactorswitch.service.commission.CommissionApplierStrategy;
-import inc.evil.refactorswitch.service.commission.DefaultCommissionApplierStrategyImpl;
+import inc.evil.refactorswitch.service.commission.CommissionApplierStrategyResolver;
 import inc.evil.refactorswitch.service.dto.PaymentResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Slf4j
 @Service
@@ -23,19 +20,14 @@ class PaymentServiceImpl implements PaymentService {
     private final ProductRepository productRepository;
     private final PaymentClient paymentClient;
 
-    private final List<CommissionApplierStrategy> commissionApplierStrategies;
-    private final DefaultCommissionApplierStrategyImpl defaultCommissionApplierStrategy;
+    private final CommissionApplierStrategyResolver commissionApplierResolver;
 
     @Override
     public void payForProduct(Long productId, Client client) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ProductNotFoundException(String.format("Product with id %s not found", productId)));
 
-        double updatedPrice = commissionApplierStrategies.stream()
-                .filter(s -> s.getCardType() == client.getCard().getType())
-                .findFirst()
-                .orElse(defaultCommissionApplierStrategy)
-                .applyCommission(client, product);
+        double updatedPrice = commissionApplierResolver.getCommissionApplier(client.getCard().getType()).applyCommission(client, product);
 
         PaymentResponse paymentResponse = paymentClient.debitCard(client.getCard(), updatedPrice);
         if (paymentResponse.isSuccess()) {

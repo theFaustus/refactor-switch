@@ -24,6 +24,12 @@ public class RefactorSwitchApplication {
 			Card card = new Card("Sponge Bob", "8945-7898-7895-7895", LocalDate.MAX, "123", CardType.TRAVEL, true);
 			Client client = new Client("978456789", "Sponge", "bob", card, true, 19);
 			paymentService.payForProduct(1L, client);
+			card.setType(CardType.BUSINESS);
+			paymentService.payForProduct(2L, client);
+			card.setType(CardType.CASHBACK);
+			paymentService.payForProduct(3L, client);
+			card.setType(CardType.REWARDS);
+			paymentService.payForProduct(4L, client);
 		};
 	}
 
