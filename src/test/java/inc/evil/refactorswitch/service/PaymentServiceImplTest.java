@@ -223,9 +223,8 @@ class PaymentServiceImplTest {
     }
 
     @Test
-    void payForProduct_whenProductFoundAndCardTypeBUSINESSAndProductCategoryNotBUSINESS_appliesBUSINESS_COMISSIONAndTAX() {
+    void payForProduct_whenProductFoundAndCardTypeBUSINESS_appliesBUSINESS_COMISSIONAndTAX() {
         card.setType(CardType.BUSINESS);
-        product.setCategory(Category.GAMING);
         when(productRepository.findById(PRODUCT_ID)).thenReturn(Optional.of(product));
         when(paymentClient.debitCard(eq(card), any(Double.class))).thenReturn(new PaymentResponse(""));
 
@@ -238,7 +237,7 @@ class PaymentServiceImplTest {
     }
 
     @Test
-    void payForProduct_whenProductFoundAndCardTypeSUBPRIMEAndProductCategoryNotBUSINESS_appliesDEFAULT_COMISSION() {
+    void payForProduct_whenProductFoundAndCardTypeSUBPRIME_appliesDEFAULT_COMISSION() {
         card.setType(CardType.SUBPRIME);
         when(productRepository.findById(PRODUCT_ID)).thenReturn(Optional.of(product));
         when(paymentClient.debitCard(eq(card), any(Double.class))).thenReturn(new PaymentResponse(""));
